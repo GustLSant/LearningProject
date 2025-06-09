@@ -7,7 +7,6 @@ public class PlayerMovementComponent : MonoBehaviour
 {
     [SerializeField] private GameObject pivotRot;
     [SerializeField] private GameObject tpsBody;
-    [SerializeField] private GameObject pivotBodyRefRot;
     CharacterController controller;
 
     [SerializeField] const float MAX_WALKING_SPEED = 6.0f;
@@ -56,20 +55,7 @@ public class PlayerMovementComponent : MonoBehaviour
     void handleBodyRotation()
     {
         bool isPlayerMoving = moveDirection != Vector3.zero;
-        // if (isPlayerMoving)
-        // {
-        //     float targetRotY = pivotBodyRefRot.transform.eulerAngles.y;
-        //     float smoothedRot = Mathf.LerpAngle(
-        //         tpsBody.transform.eulerAngles.y,
-        //         targetRotY,
-        //         MOVE_SPEED_ACCELERATION * 1.25f * Time.deltaTime
-        //     );
-        //     tpsBody.transform.rotation = Quaternion.Euler(
-        //         tpsBody.transform.eulerAngles.x,
-        //         smoothedRot,
-        //         tpsBody.transform.eulerAngles.z
-        //     );
-        // }
+
         if (isPlayerMoving)
         {
             GameObject refBodyRot = new GameObject("RefRotBody");
@@ -77,7 +63,6 @@ public class PlayerMovementComponent : MonoBehaviour
             Vector3 targetPos = tpsBody.transform.position + moveDirection * 100.0f;
             refBodyRot.transform.LookAt(targetPos);
 
-            // tpsBody.transform.LookAt(targetPos);
             tpsBody.transform.rotation = Quaternion.Slerp(
                 tpsBody.transform.rotation,
                 refBodyRot.transform.rotation, 

@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 public class TpsCameraHandler : MonoBehaviour
 {
     [SerializeField] private GameObject pivotRot;
-    [SerializeField] private GameObject pivotBodyRefRot;
     Vector2 rotInput;
     Vector2 cameraRotation;
 
@@ -24,7 +23,6 @@ public class TpsCameraHandler : MonoBehaviour
     void LateUpdate()
     {
         handleCameraRotation();
-        handleRotReferenceForBody();
     }
 
 
@@ -36,14 +34,6 @@ public class TpsCameraHandler : MonoBehaviour
         cameraRotation.x = Math.Clamp(cameraRotation.x, -80.0f, 80.0f);
 
         pivotRot.transform.rotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0f);
-    }
-
-
-    void handleRotReferenceForBody()
-    {
-        Vector3 targetPos = pivotRot.transform.position + pivotRot.transform.forward * 100.0f;
-        pivotBodyRefRot.transform.LookAt(targetPos);
-        pivotBodyRefRot.transform.eulerAngles = new Vector3(0, pivotBodyRefRot.transform.eulerAngles.y, 0);
     }
 
 
