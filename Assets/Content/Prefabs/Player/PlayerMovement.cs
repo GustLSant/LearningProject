@@ -3,10 +3,9 @@ using UnityEngine.InputSystem;
 using System;
 
 
-public class PlayerMovementComponent : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private GameObject pivotRot;
-    [SerializeField] private GameObject tpsBody;
+    PlayerCameraManager playerCameraManager;
     CharacterController controller;
 
     [SerializeField] const float MAX_WALKING_SPEED = 6.0f;
@@ -14,25 +13,27 @@ public class PlayerMovementComponent : MonoBehaviour
     [SerializeField] const float MOVE_SPEED_ACCELERATION = 12.0f;
     private float currentMoveSpeed = 0.0f;
     private bool isSprinting = false;
-    Vector3 moveDirection;
+    [HideInInspector] public Vector3 moveDirection;
     Vector2 moveInput;
 
 
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+        playerCameraManager = GetComponent<PlayerCameraManager>();
     }
 
 
     void FixedUpdate()
     {
         handleMovement();
-        handleBodyRotation();
     }
 
 
     void handleMovement()
     {
+        GameObject pivotRot = playerCameraManager.currentPivotRot;
+        
         moveDirection = pivotRot.transform.forward * moveInput.y + pivotRot.transform.right * moveInput.x;
         moveDirection.y = 0.0f;
         moveDirection = moveDirection.normalized;
@@ -49,26 +50,6 @@ public class PlayerMovementComponent : MonoBehaviour
         );
 
         controller.Move(moveDirection * currentMoveSpeed * Time.deltaTime);
-    }
-
-
-    void handleBodyRotation()
-    {
-        bool isPlayerMoving = moveDirection != Vector3.zero;
-
-        if (isPlayerMoving)
-        {
-            GameObject refBodyRot = new GameObject("RefRotBody");
-            refBodyRot.transform.position = tpsBody.transform.position;
-            Vector3 targetPos = tpsBody.transform.position + moveDirection * 100.0f;
-            refBodyRot.transform.LookAt(targetPos);
-
-            tpsBody.transform.rotation = Quaternion.Slerp(
-                tpsBody.transform.rotation,
-                refBodyRot.transform.rotation, 
-                MOVE_SPEED_ACCELERATION * 1.25f * Time.deltaTime
-            );
-        }
     }
 
 

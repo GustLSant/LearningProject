@@ -3,28 +3,24 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-public class TpsCameraHandler : MonoBehaviour
+public class FpsController : MonoBehaviour
 {
+    [SerializeField] private GameObject player;
     [SerializeField] private GameObject pivotRot;
+    [SerializeField] private GameObject body;
     Vector2 rotInput;
-    Vector2 cameraRotation;
+    [HideInInspector] public Vector2 cameraRotation; // eh public para fazer a sincronizacao da rotacao das camera apos trocar o tipo
 
     [Header("Camera Sensitivity")]
     public float hLookSensi = 0.3f;
     public float vLookSensi = 0.3f;
 
 
-    void Start()
-    {
-
-    }
-
-
     void LateUpdate()
     {
         handleCameraRotation();
+        handleBodyRotation();
     }
-
 
 
     void handleCameraRotation()
@@ -34,6 +30,19 @@ public class TpsCameraHandler : MonoBehaviour
         cameraRotation.x = Math.Clamp(cameraRotation.x, -80.0f, 80.0f);
 
         pivotRot.transform.rotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0f);
+    }
+
+
+    void handleBodyRotation()
+    {
+        body.transform.eulerAngles = new Vector3(body.transform.eulerAngles.x, cameraRotation.y, body.transform.eulerAngles.z);
+    }
+
+
+    public void syncCameraRotation(Vector2 _newRot)
+    {
+        cameraRotation = _newRot;
+        body.transform.eulerAngles = new Vector3(body.transform.eulerAngles.x, cameraRotation.y, body.transform.eulerAngles.z);
     }
 
 
