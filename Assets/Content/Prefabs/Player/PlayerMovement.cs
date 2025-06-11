@@ -5,7 +5,9 @@ using System;
 
 public class PlayerMovement : MonoBehaviour
 {
+    PlayerInputManager playerInputManager;
     PlayerCameraManager playerCameraManager;
+    PlayerJumpManager playerJumpManager;
     CharacterController controller;
 
     [SerializeField] const float MAX_WALKING_SPEED = 6.0f;
@@ -19,14 +21,24 @@ public class PlayerMovement : MonoBehaviour
 
     void Awake()
     {
+        playerInputManager = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
         controller = GetComponent<CharacterController>();
         playerCameraManager = GetComponent<PlayerCameraManager>();
+        playerJumpManager = GetComponent<PlayerJumpManager>();
     }
 
 
     void FixedUpdate()
     {
+        getInputValues();
         handleMovement();
+    }
+
+
+    void getInputValues()
+    {
+        moveInput = playerInputManager.moveInput;
+        isSprinting = playerInputManager.sprintInput;
     }
 
 
@@ -49,17 +61,8 @@ public class PlayerMovement : MonoBehaviour
             MOVE_SPEED_ACCELERATION * Time.deltaTime
         );
 
-        controller.Move(moveDirection * currentMoveSpeed * Time.deltaTime);
-    }
+        Vector3 verticalMovement = new Vector3(0.0f, playerJumpManager.currentVerticalMovement, 0.0f);
 
-
-    void OnMove(InputValue _value)
-    {
-        moveInput = _value.Get<Vector2>();
-    }
-
-    void OnSprint(InputValue _value)
-    {
-        isSprinting = Convert.ToBoolean(_value.Get<float>());
+        controller.Move((moveDirection * currentMoveSpeed + verticalMovement) * Time.deltaTime);
     }
 }

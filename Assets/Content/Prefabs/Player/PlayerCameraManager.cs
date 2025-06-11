@@ -14,6 +14,14 @@ public class PlayerCameraManager : MonoBehaviour
     [HideInInspector] public GameObject currentPivotRot; // eh public para o jogador usar na movimentacao
     [HideInInspector] public CameraType currentCameraMode;
 
+    [Header("Camera Sensitivity")]
+    public float hLookSensi = 0.3f;
+    public float vLookSensi = 0.3f;
+
+    [Header("Default FOV")]
+    public float defaultFOV = 75.0f;
+    public float aimingFovDecrement = 25.0f;
+
 
     void Start()
     {
@@ -42,7 +50,7 @@ public class PlayerCameraManager : MonoBehaviour
     }
 
 
-    void OnChangeCameraType()
+    public void OnPlayerChangeCameraType()
     {
         if (currentCameraMode == CameraType.FPS) { setCameraType(CameraType.TPS); }
         else { setCameraType(CameraType.FPS); }
