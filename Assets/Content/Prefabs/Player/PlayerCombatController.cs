@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerCombatManager : MonoBehaviour
+public class PlayerCombatController : MonoBehaviour
 {
     PlayerInputManager playerInputManager;
-    public bool isAiming = false;
+    [HideInInspector] public bool isAiming = false;
 
 
     void Start()

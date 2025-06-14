@@ -13,6 +13,7 @@ public class PlayerInputManager : MonoBehaviour
 
     public UnityEvent OnPlayerJump;
     public UnityEvent OnPlayerChangeCameraType;
+    public UnityEvent OnPlayerToggleTpsCameraSide;
 
 
     void OnMove(InputValue _value)
@@ -43,6 +44,13 @@ public class PlayerInputManager : MonoBehaviour
     {
         OnPlayerChangeCameraType?.Invoke();
     }
+
+
+    void OnToggleTpsCameraSide()
+    {
+        OnPlayerToggleTpsCameraSide?.Invoke();
+    }
+
 
     void OnAim(InputValue _value)
     {

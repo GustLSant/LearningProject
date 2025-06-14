@@ -5,37 +5,27 @@ using Unity.Cinemachine;
 
 public class TpsController : PlayerCameraController
 {
-    [SerializeField] GameObject cinemachineCamera;
     CinemachineThirdPersonFollow cinemachineThirdPersonFollow;
     float currentCameraSide = 1.0f;
 
 
-    void Start()
+    protected override void Start()
     {
         base.Start();
         cinemachineThirdPersonFollow = cinemachineCamera.GetComponent<CinemachineThirdPersonFollow>();
     }
 
 
-    void Update()
+    protected override void LateUpdate()
     {
+        base.LateUpdate();
         cinemachineThirdPersonFollow.CameraSide = Mathf.Lerp(cinemachineThirdPersonFollow.CameraSide, currentCameraSide, 10 * Time.deltaTime);
-    }
-
-
-    override protected void handleCameraRotation()
-    {
-        cameraRotation.x -= rotInput.y * playerCameraManager.vLookSensi;
-        cameraRotation.y += rotInput.x * playerCameraManager.hLookSensi;
-        cameraRotation.x = Math.Clamp(cameraRotation.x, -80.0f, 80.0f);
-
-        pivotRot.transform.rotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0f);
     }
 
 
     override protected void handleBodyRotation()
     {
-        Vector3 moveDirection = player.GetComponent<PlayerMovement>().moveDirection;
+        Vector3 moveDirection = playerMovementController.moveDirection;
         bool isPlayerMoving = moveDirection != Vector3.zero;
 
         if (isPlayerMoving)
@@ -50,11 +40,18 @@ public class TpsController : PlayerCameraController
                 refBodyRot.transform.rotation,
                 15.0f * Time.deltaTime
             );
+
+            Destroy(refBodyRot);
+        }
+        if (isPlayerAiming)
+        {
+            body.transform.eulerAngles = cameraRotation;
+            body.transform.eulerAngles = new Vector3(0.0f, body.transform.eulerAngles.y, body.transform.eulerAngles.z);
         }
     }
 
 
-    void OnToggleTpsCameraSide()
+    public void OnPlayerToggleTpsCameraSide()
     {
         if (currentCameraSide == 1.0f) { currentCameraSide = 0f; }
         else { currentCameraSide = 1.0f; }
