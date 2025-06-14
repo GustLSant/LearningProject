@@ -1,59 +1,32 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Events;
-using System;
 
 
 public class PlayerInputManager : MonoBehaviour
 {
-    [HideInInspector] public Vector2 moveInput = Vector2.zero;
-    [HideInInspector] public bool sprintInput = false;
-    [HideInInspector] public Vector2 lookRotInput = Vector2.zero;
-    [HideInInspector] public bool aimingInput = false;
+    public InputActionAsset inputActions;
 
-    public UnityEvent OnPlayerJump;
-    public UnityEvent OnPlayerChangeCameraType;
-    public UnityEvent OnPlayerToggleTpsCameraSide;
+    public InputAction moveAction;
+    public InputAction lookAction;
+    public InputAction sprintAction;
+    public InputAction jumpAction;
+    public InputAction aimAction;
+    public InputAction changeCameraModeAction;
+    public InputAction toggleTpsCameraSideAction;
 
 
-    void OnMove(InputValue _value)
+    void OnEnable() { inputActions.FindActionMap("Player").Enable(); }
+
+    void OnDisable() { inputActions.FindActionMap("Player").Disable(); }
+
+    void Awake()
     {
-        moveInput = _value.Get<Vector2>();
-    }
-
-
-    void OnSprint(InputValue _value)
-    {
-        sprintInput = Convert.ToBoolean(_value.Get<float>());
-    }
-
-
-    void OnLook(InputValue _value)
-    {
-        lookRotInput = _value.Get<Vector2>();
-    }
-
-
-    void OnJump()
-    {
-        OnPlayerJump?.Invoke();
-    }
-
-
-    void OnChangeCameraType()
-    {
-        OnPlayerChangeCameraType?.Invoke();
-    }
-
-
-    void OnToggleTpsCameraSide()
-    {
-        OnPlayerToggleTpsCameraSide?.Invoke();
-    }
-
-
-    void OnAim(InputValue _value)
-    {
-        aimingInput = _value.Get<float>() == 1.0f;
+        moveAction = InputSystem.actions.FindAction("Move");
+        lookAction = InputSystem.actions.FindAction("Look");
+        sprintAction = InputSystem.actions.FindAction("Sprint");
+        jumpAction = InputSystem.actions.FindAction("Jump");
+        aimAction = InputSystem.actions.FindAction("Aim");
+        changeCameraModeAction = InputSystem.actions.FindAction("ChangeCameraMode");
+        toggleTpsCameraSideAction = InputSystem.actions.FindAction("ToggleTpsCameraSide");
     }
 }

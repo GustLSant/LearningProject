@@ -6,6 +6,8 @@ public class PlayerCameraManager : MonoBehaviour
 {
     public enum CameraType { TPS, FPS }
 
+    PlayerInputManager pInpM;
+
     [SerializeField] private GameObject fpsRoot;
     [SerializeField] private GameObject fpsPivotRot;
     [SerializeField] private GameObject tpsRoot;
@@ -23,9 +25,20 @@ public class PlayerCameraManager : MonoBehaviour
     public float aimingFovDecrement = 25.0f;
 
 
-    void Start()
+    void Awake()
     {
+        pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
+        print(pInpM);
+
         setCameraType(CameraType.FPS);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+
+    void Update()
+    {
+        if(pInpM.changeCameraModeAction.WasPressedThisFrame()){ changeCameraType(); }
     }
 
 
@@ -50,7 +63,7 @@ public class PlayerCameraManager : MonoBehaviour
     }
 
 
-    public void OnPlayerChangeCameraType()
+    public void changeCameraType()
     {
         if (currentCameraMode == CameraType.FPS) { setCameraType(CameraType.TPS); }
         else { setCameraType(CameraType.FPS); }

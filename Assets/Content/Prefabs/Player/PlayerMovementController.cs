@@ -5,24 +5,27 @@ using System;
 
 public class PlayerMovementController : MonoBehaviour
 {
-    PlayerInputManager playerInputManager;
+    PlayerInputManager pInpM; // playerInputManager
+
     PlayerCameraManager playerCameraManager;
     PlayerJumpController playerJumpManager;
     PlayerCombatController playerCombatController;
     CharacterController controller;
 
     [SerializeField] const float MAX_WALKING_SPEED = 6.0f;
-    [SerializeField] const float SPRINT_SPEED_MULTIPLIER = 2.0f;
     [SerializeField] const float MOVE_SPEED_ACCELERATION = 12.0f;
     [HideInInspector] public float currentMoveSpeed = 0.0f;
-    private bool isSprinting = false;
     [HideInInspector] public Vector3 moveDirection;
     Vector2 moveInput;
+
+    [SerializeField] const float SPRINT_SPEED_MULTIPLIER = 2.0f;
+    private bool isSprinting = false;
 
 
     void Awake()
     {
-        playerInputManager = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
+        pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
+
         controller = GetComponent<CharacterController>();
         playerCameraManager = GetComponent<PlayerCameraManager>();
         playerJumpManager = GetComponent<PlayerJumpController>();
@@ -30,17 +33,27 @@ public class PlayerMovementController : MonoBehaviour
     }
 
 
-    void FixedUpdate()
+    void Update()
     {
         getInputValues();
+    }
+
+
+    void FixedUpdate()
+    {
         handleMovement();
     }
 
 
     void getInputValues()
     {
-        moveInput = playerInputManager.moveInput;
-        isSprinting = playerInputManager.sprintInput;
+        if (S_GameSettings.instance.isSprintHoldMode) { print("NAOOOOO");  isSprinting = pInpM.sprintAction.IsPressed(); }
+        else
+        {
+            if (pInpM.sprintAction.WasPressedThisFrame()) { isSprinting = !isSprinting; }
+        }
+        
+        moveInput = pInpM.moveAction.ReadValue<Vector2>();
     }
 
 

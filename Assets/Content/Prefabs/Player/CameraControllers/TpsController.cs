@@ -9,10 +9,16 @@ public class TpsController : PlayerCameraController
     float currentCameraSide = 1.0f;
 
 
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
         cinemachineThirdPersonFollow = cinemachineCamera.GetComponent<CinemachineThirdPersonFollow>();
+    }
+
+
+    void Update()
+    {
+        if (pInpM.toggleTpsCameraSideAction.WasPressedThisFrame()) { toggleTpsCameraSide(); }
     }
 
 
@@ -43,7 +49,7 @@ public class TpsController : PlayerCameraController
 
             Destroy(refBodyRot);
         }
-        if (isPlayerAiming)
+        if (playerCombatManager.isAiming)
         {
             body.transform.eulerAngles = cameraRotation;
             body.transform.eulerAngles = new Vector3(0.0f, body.transform.eulerAngles.y, body.transform.eulerAngles.z);
@@ -51,7 +57,7 @@ public class TpsController : PlayerCameraController
     }
 
 
-    public void OnPlayerToggleTpsCameraSide()
+    public void toggleTpsCameraSide()
     {
         if (currentCameraSide == 1.0f) { currentCameraSide = 0f; }
         else { currentCameraSide = 1.0f; }

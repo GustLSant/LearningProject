@@ -6,30 +6,26 @@ using UnityEngine.InputSystem;
 
 public class PlayerCameraController : MonoBehaviour
 {
+    protected PlayerInputManager pInpM;
+
     [SerializeField] protected GameObject pivotRot;
     [SerializeField] protected GameObject body;
     [SerializeField] protected GameObject cinemachineGameObject;
 
-    PlayerInputManager playerInputManager;
     protected PlayerMovementController playerMovementController;
     protected PlayerCameraManager playerCameraManager;
-    private PlayerCombatController playerCombatManager;
+    protected PlayerCombatController playerCombatManager;
     protected CinemachineCamera cinemachineCamera;
 
     protected Vector2 rotInput;
     [HideInInspector] public Vector2 cameraRotation; // eh public para fazer a sincronizacao da rotacao das camera apos trocar o tipo
 
-    protected bool isPlayerAiming = false;
 
-
-    protected virtual void Start()
+    protected virtual void Awake()
     {
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-
         GameObject player = GameObject.FindWithTag("Player");
+        pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
 
-        playerInputManager = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
         playerMovementController = player.GetComponent<PlayerMovementController>();
         playerCameraManager = player.GetComponent<PlayerCameraManager>();
         playerCombatManager = player.GetComponent<PlayerCombatController>();
@@ -48,9 +44,9 @@ public class PlayerCameraController : MonoBehaviour
 
     virtual protected void handleCameraRotation()
     {
-        float isAimingSpeedMultiplier = 1.0f - Convert.ToInt32(isPlayerAiming) * 0.5f;
-        cameraRotation.x -= rotInput.y * playerCameraManager.vLookSensi * isAimingSpeedMultiplier;
-        cameraRotation.y += rotInput.x * playerCameraManager.hLookSensi * isAimingSpeedMultiplier;
+        float isAimingSpeedMultiplier = 1.0f - Convert.ToInt32(playerCombatManager.isAiming) * 0.5f;
+        cameraRotation.x -= rotInput.y * S_GameSettings.instance.vLookSensi * isAimingSpeedMultiplier;
+        cameraRotation.y += rotInput.x * S_GameSettings.instance.hLookSensi * isAimingSpeedMultiplier;
         cameraRotation.x = Math.Clamp(cameraRotation.x, -80.0f, 80.0f);
 
         pivotRot.transform.rotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0f);
@@ -84,7 +80,6 @@ public class PlayerCameraController : MonoBehaviour
 
     void getInputValues()
     {
-        rotInput = playerInputManager.lookRotInput;
-        isPlayerAiming = playerCombatManager.isAiming;
+        rotInput = pInpM.lookAction.ReadValue<Vector2>();
     }
 }
