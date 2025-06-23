@@ -28,7 +28,6 @@ public class PlayerCameraManager : MonoBehaviour
     void Awake()
     {
         pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
-        print(pInpM);
 
         setCameraType(CameraType.FPS);
         Cursor.lockState = CursorLockMode.Locked;

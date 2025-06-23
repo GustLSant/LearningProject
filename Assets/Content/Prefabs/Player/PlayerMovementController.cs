@@ -12,14 +12,14 @@ public class PlayerMovementController : MonoBehaviour
     PlayerCombatController playerCombatController;
     CharacterController controller;
 
-    [SerializeField] const float MAX_WALKING_SPEED = 6.0f;
+    [SerializeField] const float MAX_WALKING_SPEED = 4.0f;
     [SerializeField] const float MOVE_SPEED_ACCELERATION = 12.0f;
     [HideInInspector] public float currentMoveSpeed = 0.0f;
     [HideInInspector] public Vector3 moveDirection;
     Vector2 moveInput;
 
     [SerializeField] const float SPRINT_SPEED_MULTIPLIER = 2.0f;
-    private bool isSprinting = false;
+    public bool isSprinting = false;
 
 
     void Awake()
@@ -68,8 +68,8 @@ public class PlayerMovementController : MonoBehaviour
         int isPlayerMovingInt = Convert.ToInt32(moveDirection != Vector3.zero);
         int isPlayerStandingStillInt = Convert.ToInt32(moveDirection == Vector3.zero);
 
-        // so corre se nao tiver mirando
-        isSprinting = isSprinting && !playerCombatController.isAiming;
+        // so corre se nao tiver mirando ou se movimentando
+        isSprinting = isSprinting && !playerCombatController.isAiming && (moveDirection != Vector3.zero);
         // em primeira pessoa, so corre se estiver andando pra frente
         if (playerCameraManager.currentCameraMode == PlayerCameraManager.CameraType.FPS) { isSprinting = isSprinting && (moveInput.y > 0.0f); }
         float currentSprintSpeedMultiplier = (isSprinting && isPlayerMovingInt==1) ? SPRINT_SPEED_MULTIPLIER : 1.0f;

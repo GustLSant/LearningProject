@@ -33,16 +33,21 @@ public class PlayerCameraController : MonoBehaviour
     }
 
 
-    protected virtual void LateUpdate()
+    protected virtual void Update()
     {
         getInputValues();
         handleCameraRotation();
+    }
+
+
+    protected virtual void LateUpdate()
+    {
         handleBodyRotation();
         handleAimState();
     }
 
 
-    virtual protected void handleCameraRotation()
+    void handleCameraRotation()
     {
         float isAimingSpeedMultiplier = 1.0f - Convert.ToInt32(playerCombatManager.isAiming) * 0.5f;
         cameraRotation.x -= rotInput.y * S_GameSettings.instance.vLookSensi * isAimingSpeedMultiplier;
@@ -62,7 +67,7 @@ public class PlayerCameraController : MonoBehaviour
     public void syncCameraRotation(Vector2 _newRot)
     {
         cameraRotation = _newRot;
-        body.transform.eulerAngles = new Vector3(body.transform.eulerAngles.x, cameraRotation.y, body.transform.eulerAngles.z);
+        if(body){ body.transform.eulerAngles = new Vector3(body.transform.eulerAngles.x, cameraRotation.y, body.transform.eulerAngles.z); }
     }
 
 

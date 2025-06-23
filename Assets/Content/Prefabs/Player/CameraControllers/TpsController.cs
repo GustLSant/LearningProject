@@ -16,8 +16,9 @@ public class TpsController : PlayerCameraController
     }
 
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         if (pInpM.toggleTpsCameraSideAction.WasPressedThisFrame()) { toggleTpsCameraSide(); }
     }
 
@@ -51,8 +52,10 @@ public class TpsController : PlayerCameraController
         }
         if (playerCombatManager.isAiming)
         {
-            body.transform.eulerAngles = cameraRotation;
-            body.transform.eulerAngles = new Vector3(0.0f, body.transform.eulerAngles.y, body.transform.eulerAngles.z);
+            // body.transform.eulerAngles = cameraRotation;
+            // body.transform.eulerAngles = new Vector3(0.0f, body.transform.eulerAngles.y, body.transform.eulerAngles.z);
+            Quaternion targetRotation = Quaternion.Euler(0.0f, cameraRotation.y, 0.0f);
+            body.transform.rotation = targetRotation;
         }
     }
 

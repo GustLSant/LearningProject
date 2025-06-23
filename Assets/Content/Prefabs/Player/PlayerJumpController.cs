@@ -8,8 +8,8 @@ public class PlayerJumpController : MonoBehaviour
 
     [SerializeField] private float gravityAccel = 20.0f;
     [SerializeField] private float jumpStrength = 7.5f;
-    [HideInInspector] public float currentVerticalMovement = 0.0f; // eh public para o componente de movimentacao conseguir acessar
-    bool isGrounded = false;
+    [HideInInspector] public float currentVerticalMovement = 0.0f;
+    public bool isGrounded = false;
     const float GRAVITY_TERMINAL_VELOCITY = -20.0f;
 
 
@@ -27,9 +27,9 @@ public class PlayerJumpController : MonoBehaviour
 
     void FixedUpdate()
     {
-        isGrounded = Physics.Raycast(transform.position + Vector3.up*0.1f, Vector3.down, 0.3f);
+        isGrounded = Physics.Raycast(transform.position + Vector3.up*0.1f, Vector3.down, 0.11f);
         // if (controller.isGrounded && currentVerticalMovement < 0.0f) { currentVerticalMovement = 0.0f; }
-        if (isGrounded && currentVerticalMovement < 0.0f) { currentVerticalMovement = 0.0f; }
+        if (isGrounded) { currentVerticalMovement = 0.0f; }
         else
         {
             currentVerticalMovement -= gravityAccel * Time.fixedDeltaTime;
@@ -40,7 +40,8 @@ public class PlayerJumpController : MonoBehaviour
     public void OnPlayerJump()
     {
         //if (controller.isGrounded) { currentVerticalMovement = jumpStrength; } // o problema eh q as vezes o isGrounded nao funciona
-        if (isGrounded) { currentVerticalMovement = jumpStrength; }
-
+        if (isGrounded) {
+            currentVerticalMovement = jumpStrength; 
+        }
     }
 }
