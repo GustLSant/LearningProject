@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PlayerInputManager
   - PlayerTpsCameraController
+  - PlayerFpsCameraController
   layers:
   - Default
   - TransparentFX

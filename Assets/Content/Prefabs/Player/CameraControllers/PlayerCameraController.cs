@@ -1,21 +1,21 @@
 using System;
-using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 
-public class PlayerCameraController : MonoBehaviour
+public abstract class PlayerCameraController : MonoBehaviour
 {
     protected PlayerInputManager pInpM;
 
-    [SerializeField] protected GameObject pivotRot;
+    [HideInInspector] public GameObject pivotRot;
+    protected GameObject pivotSway;
+    protected GameObject pivotRecoil;
+    protected GameObject pivotShake;
+    protected Camera cameraComponent;
     [SerializeField] protected GameObject body;
-    [SerializeField] protected GameObject cinemachineGameObject;
 
     protected PlayerMovementController playerMovementController;
     protected PlayerCameraManager playerCameraManager;
     protected PlayerCombatController playerCombatManager;
-    protected CinemachineCamera cinemachineCamera;
 
     protected Vector2 rotInput;
     [HideInInspector] public Vector2 cameraRotation; // eh public para fazer a sincronizacao da rotacao das camera apos trocar o tipo
@@ -23,27 +23,35 @@ public class PlayerCameraController : MonoBehaviour
 
     protected virtual void Awake()
     {
+        Debug.Log("Meu transform é: " + gameObject.name);
+        Debug.Log("Filhos diretos:");
+        foreach(Transform child in transform)
+        {
+            Debug.Log("- " + child.name);
+        }
+
+
         GameObject player = GameObject.FindWithTag("Player");
         pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
+
+        pivotRot = transform.Find("PivotRot").gameObject;
+        pivotSway = transform.Find("PivotRot/PivotSway").gameObject;
+        pivotShake = transform.Find("PivotRot/PivotSway/PivotShake").gameObject;
+        cameraComponent = transform.Find("PivotRot/PivotSway/PivotShake/Camera").GetComponent<Camera>();
 
         playerMovementController = player.GetComponent<PlayerMovementController>();
         playerCameraManager = player.GetComponent<PlayerCameraManager>();
         playerCombatManager = player.GetComponent<PlayerCombatController>();
-        cinemachineCamera = cinemachineGameObject.GetComponent<CinemachineCamera>();
-    }
-
-
-    protected virtual void Update()
-    {
-        getInputValues();
-        handleCameraRotation();
     }
 
 
     protected virtual void LateUpdate()
     {
+        getInputValues();
+        handleCameraRotation();
         handleBodyRotation();
-        handleAimState();
+        handleAimEffect();
+        handleSwayEffect();
     }
 
 
@@ -71,12 +79,33 @@ public class PlayerCameraController : MonoBehaviour
     }
 
 
-    virtual protected void handleAimState()
+    void handleSwayEffect()
+    {
+        int isPlayerStandingStillInt = Convert.ToInt32(playerMovementController.moveDirection == Vector3.zero);
+        int isPlayerSprintingInt = Convert.ToInt32(playerMovementController.isSprinting);
+
+        float msecs = Time.realtimeSinceStartup * 1000f;
+        float frequency = 0.02f; //+ (isPlayerSprintingInt * 0.02f);
+        float amplitude = 0.05f + (isPlayerSprintingInt * 0.05f);
+
+        Vector3 targetSwayPos = new Vector3(
+            Mathf.Sin(msecs * frequency * 0.5f) * amplitude,
+            Mathf.Sin(msecs * frequency) * amplitude,
+            0.0f
+        );
+        
+        targetSwayPos *= 1.0f - isPlayerStandingStillInt;
+
+        pivotSway.transform.localPosition = Vector3.Lerp(pivotSway.transform.localPosition, targetSwayPos, 10*Time.deltaTime);
+    }
+
+
+    virtual protected void handleAimEffect()
     {
         float defaultFOV = playerCameraManager.defaultFOV;
 
-        cinemachineCamera.Lens.FieldOfView = Mathf.Lerp(
-            cinemachineCamera.Lens.FieldOfView,
+        cameraComponent.fieldOfView = Mathf.Lerp(
+            cameraComponent.fieldOfView,
             defaultFOV - Convert.ToInt32(playerCombatManager.isAiming) * playerCameraManager.aimingFovDecrement,
             12.0f * Time.deltaTime
         );
