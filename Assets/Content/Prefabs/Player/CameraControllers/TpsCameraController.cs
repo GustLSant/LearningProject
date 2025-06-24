@@ -6,14 +6,18 @@ using UnityEngine;
 public class TpsCameraController : PlayerCameraController
 {
     GameObject refBodyRot;
-    float currentCameraSide = 1.0f;
+    GameObject springArmTarget;
     readonly Vector3 DEFAULT_CAMERA_POS = new Vector3(1.0f, 0.5f, -2.75f);
+
+    float currentCameraSide = 1.0f;
+    float targetCameraSide = 1.0f;
 
 
     protected override void Awake()
     {
         base.Awake();
         refBodyRot = transform.Find("PivotRefRot").gameObject;
+        springArmTarget = transform.Find("PivotRot/SpringArmTarget").gameObject;
     }
 
 
@@ -21,6 +25,7 @@ public class TpsCameraController : PlayerCameraController
     {
         base.LateUpdate();
         if (pInpM.toggleTpsCameraSideAction.WasPressedThisFrame()) { toggleTpsCameraSide(); }
+        handleCameraSideInterpolation();
         handleCameraPosition();
         handleCameraDelayEffect();
     }
@@ -41,7 +46,7 @@ public class TpsCameraController : PlayerCameraController
         pivotRecoil.transform.localPosition = Vector3.Lerp(
             pivotRecoil.transform.localPosition,
             targetOffset,
-            Time.deltaTime * 7.0f
+            Time.deltaTime * 8.0f
         );
     }
 
@@ -52,6 +57,17 @@ public class TpsCameraController : PlayerCameraController
         targetPosition.x *= currentCameraSide;
 
         cameraObject.transform.localPosition = targetPosition;
+
+        Vector3 origin = pivotRot.transform.position;
+        Vector3 direction = (cameraObject.transform.position - pivotRot.transform.position).normalized; // direcao do pivotRot ate a camera, em coordenadas globais
+        float maxDistance = DEFAULT_CAMERA_POS.magnitude;
+        float radius = 0.2f;
+
+        if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, maxDistance))
+        {
+            float safePercent = (hit.distance - 0.1f) / maxDistance;
+            cameraObject.transform.localPosition = targetPosition * safePercent;
+        }
     }
 
 
@@ -79,8 +95,14 @@ public class TpsCameraController : PlayerCameraController
     }
 
 
+    void handleCameraSideInterpolation()
+    {
+        currentCameraSide = Mathf.Lerp(currentCameraSide, targetCameraSide, 10 * Time.deltaTime);
+    }
+
+
     public void toggleTpsCameraSide()
     {
-        currentCameraSide *= 1.0f;
+        targetCameraSide *= -1.0f;
     }
 }
