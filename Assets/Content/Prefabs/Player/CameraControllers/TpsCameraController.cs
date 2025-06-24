@@ -6,7 +6,6 @@ using UnityEngine;
 public class TpsCameraController : PlayerCameraController
 {
     GameObject refBodyRot;
-    GameObject springArmTarget;
     readonly Vector3 DEFAULT_CAMERA_POS = new Vector3(1.0f, 0.5f, -2.75f);
 
     float currentCameraSide = 1.0f;
@@ -17,7 +16,6 @@ public class TpsCameraController : PlayerCameraController
     {
         base.Awake();
         refBodyRot = transform.Find("PivotRefRot").gameObject;
-        springArmTarget = transform.Find("PivotRot/SpringArmTarget").gameObject;
     }
 
 
