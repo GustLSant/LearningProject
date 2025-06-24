@@ -10,12 +10,14 @@ public abstract class PlayerCameraController : MonoBehaviour
     protected GameObject pivotSway;
     protected GameObject pivotRecoil;
     protected GameObject pivotShake;
+    protected GameObject cameraObject;
     protected Camera cameraComponent;
     [SerializeField] protected GameObject body;
 
     protected PlayerMovementController playerMovementController;
+    protected PlayerJumpController playerJumpController;
     protected PlayerCameraManager playerCameraManager;
-    protected PlayerCombatController playerCombatManager;
+    protected PlayerCombatController playerCombatController;
 
     protected Vector2 rotInput;
     [HideInInspector] public Vector2 cameraRotation; // eh public para fazer a sincronizacao da rotacao das camera apos trocar o tipo
@@ -23,25 +25,20 @@ public abstract class PlayerCameraController : MonoBehaviour
 
     protected virtual void Awake()
     {
-        Debug.Log("Meu transform é: " + gameObject.name);
-        Debug.Log("Filhos diretos:");
-        foreach(Transform child in transform)
-        {
-            Debug.Log("- " + child.name);
-        }
-
-
         GameObject player = GameObject.FindWithTag("Player");
         pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
 
         pivotRot = transform.Find("PivotRot").gameObject;
         pivotSway = transform.Find("PivotRot/PivotSway").gameObject;
-        pivotShake = transform.Find("PivotRot/PivotSway/PivotShake").gameObject;
-        cameraComponent = transform.Find("PivotRot/PivotSway/PivotShake/Camera").GetComponent<Camera>();
+        pivotRecoil = transform.Find("PivotRot/PivotSway/PivotRecoil").gameObject;
+        pivotShake = transform.Find("PivotRot/PivotSway/PivotRecoil/PivotShake").gameObject;
+        cameraObject = transform.Find("PivotRot/PivotSway/PivotRecoil/PivotShake/Camera").gameObject;
+        cameraComponent = cameraObject.GetComponent<Camera>();
 
         playerMovementController = player.GetComponent<PlayerMovementController>();
+        playerJumpController = player.GetComponent<PlayerJumpController>();
         playerCameraManager = player.GetComponent<PlayerCameraManager>();
-        playerCombatManager = player.GetComponent<PlayerCombatController>();
+        playerCombatController = player.GetComponent<PlayerCombatController>();
     }
 
 
@@ -57,7 +54,7 @@ public abstract class PlayerCameraController : MonoBehaviour
 
     void handleCameraRotation()
     {
-        float isAimingSpeedMultiplier = 1.0f - Convert.ToInt32(playerCombatManager.isAiming) * 0.5f;
+        float isAimingSpeedMultiplier = 1.0f - Convert.ToInt32(playerCombatController.isAiming) * 0.5f;
         cameraRotation.x -= rotInput.y * S_GameSettings.instance.vLookSensi * isAimingSpeedMultiplier;
         cameraRotation.y += rotInput.x * S_GameSettings.instance.hLookSensi * isAimingSpeedMultiplier;
         cameraRotation.x = Math.Clamp(cameraRotation.x, -80.0f, 80.0f);
@@ -82,10 +79,11 @@ public abstract class PlayerCameraController : MonoBehaviour
     void handleSwayEffect()
     {
         int isPlayerStandingStillInt = Convert.ToInt32(playerMovementController.moveDirection == Vector3.zero);
+        int isPlayerMoving = Convert.ToInt32(playerMovementController.moveDirection != Vector3.zero);
         int isPlayerSprintingInt = Convert.ToInt32(playerMovementController.isSprinting);
 
         float msecs = Time.realtimeSinceStartup * 1000f;
-        float frequency = 0.02f; //+ (isPlayerSprintingInt * 0.02f);
+        float frequency = 0.015f + (isPlayerSprintingInt * 0.015f);
         float amplitude = 0.05f + (isPlayerSprintingInt * 0.05f);
 
         Vector3 targetSwayPos = new Vector3(
@@ -94,7 +92,8 @@ public abstract class PlayerCameraController : MonoBehaviour
             0.0f
         );
         
-        targetSwayPos *= 1.0f - isPlayerStandingStillInt;
+        targetSwayPos *= Convert.ToInt32(isPlayerMoving);
+        targetSwayPos *= Convert.ToInt32(playerJumpController.isGrounded);
 
         pivotSway.transform.localPosition = Vector3.Lerp(pivotSway.transform.localPosition, targetSwayPos, 10*Time.deltaTime);
     }
@@ -106,7 +105,7 @@ public abstract class PlayerCameraController : MonoBehaviour
 
         cameraComponent.fieldOfView = Mathf.Lerp(
             cameraComponent.fieldOfView,
-            defaultFOV - Convert.ToInt32(playerCombatManager.isAiming) * playerCameraManager.aimingFovDecrement,
+            defaultFOV - Convert.ToInt32(playerCombatController.isAiming) * playerCameraManager.aimingFovDecrement,
             12.0f * Time.deltaTime
         );
     }

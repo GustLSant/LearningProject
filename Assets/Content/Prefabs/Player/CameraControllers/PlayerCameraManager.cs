@@ -6,15 +6,14 @@ public class PlayerCameraManager : MonoBehaviour
 {
     public enum CameraType { TPS, FPS }
 
-    // PlayerInputManager pInpM;
+    PlayerInputManager pInpM;
 
+    GameObject fpsRoot;
+    GameObject tpsRoot;
     FpsCameraController fpsCameraController;
-    // [SerializeField] private GameObject fpsRoot;
-    // [SerializeField] private GameObject fpsPivotRot;
-    // [SerializeField] private GameObject tpsRoot;
-    // [SerializeField] private GameObject tpsPivotRot;
+    TpsCameraController tpsCameraController;
 
-    [HideInInspector] public GameObject currentPivotRot; // eh public para o jogador usar na movimentacao
+    [HideInInspector] public GameObject currentPivotRot;
     [HideInInspector] public CameraType currentCameraMode;
 
     [Header("Camera Sensitivity")]
@@ -28,46 +27,50 @@ public class PlayerCameraManager : MonoBehaviour
 
     void Awake()
     {
-        // pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
+        pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
 
-        // setCameraType(CameraType.FPS);
-        fpsCameraController = GameObject.FindGameObjectWithTag("PlayerFpsCameraController").GetComponent<FpsCameraController>();
-        currentPivotRot = fpsCameraController.pivotRot;
+        fpsRoot = GameObject.FindGameObjectWithTag("PlayerFpsCameraController");
+        tpsRoot = GameObject.FindGameObjectWithTag("PlayerTpsCameraController");
+        fpsCameraController = fpsRoot.GetComponent<FpsCameraController>();
+        tpsCameraController = tpsRoot.GetComponent<TpsCameraController>();
+
+        setCameraType(CameraType.FPS);
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
 
-    // void Update()
-    // {
-    //     if(pInpM.changeCameraModeAction.WasPressedThisFrame()){ changeCameraType(); }
-    // }
+    void Update()
+    {
+        if(pInpM.changeCameraModeAction.WasPressedThisFrame()){ changeCameraType(); }
+    }
 
 
-    // void setCameraType(CameraType _newCameraType)
-    // {
-    //     if (_newCameraType == CameraType.FPS)
-    //     {
-    //         currentCameraMode = CameraType.FPS;
-    //         currentPivotRot = fpsPivotRot;
-    //         fpsRoot.SetActive(true);
-    //         tpsRoot.SetActive(false);
-    //         fpsRoot.GetComponent<FpsController>().syncCameraRotation(tpsRoot.GetComponent<TpsController>().cameraRotation);
-    //     }
-    //     else
-    //     {
-    //         currentCameraMode = CameraType.TPS;
-    //         currentPivotRot = tpsPivotRot;
-    //         fpsRoot.SetActive(false);
-    //         tpsRoot.SetActive(true);
-    //         tpsRoot.GetComponent<TpsController>().syncCameraRotation(fpsRoot.GetComponent<FpsController>().cameraRotation);
-    //     }
-    // }
+    void setCameraType(CameraType _newCameraType)
+    {
+        if (_newCameraType == CameraType.FPS)
+        {
+            currentCameraMode = CameraType.FPS;
+            currentPivotRot = fpsCameraController.pivotRot;
+            fpsRoot.SetActive(true);
+            tpsRoot.SetActive(false);
+            fpsCameraController.syncCameraRotation(tpsCameraController.cameraRotation);
+        }
+        else
+        {
+            currentCameraMode = CameraType.TPS;
+            currentPivotRot = tpsCameraController.pivotRot;
+            fpsRoot.SetActive(false);
+            tpsRoot.SetActive(true);
+            tpsCameraController.syncCameraRotation(fpsCameraController.cameraRotation);
+        }
+    }
 
 
-    // public void changeCameraType()
-    // {
-    //     if (currentCameraMode == CameraType.FPS) { setCameraType(CameraType.TPS); }
-    //     else { setCameraType(CameraType.FPS); }
-    // }
+    public void changeCameraType()
+    {
+        if (currentCameraMode == CameraType.FPS) { setCameraType(CameraType.TPS); }
+        else { setCameraType(CameraType.FPS); }
+    }
 }

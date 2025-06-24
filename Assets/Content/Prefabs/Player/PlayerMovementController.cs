@@ -16,7 +16,7 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] const float MOVE_SPEED_ACCELERATION = 12.0f;
     [HideInInspector] public float currentMoveSpeed = 0.0f;
     [HideInInspector] public Vector3 moveDirection;
-    Vector2 moveInput;
+    public Vector2 moveInput;
 
     [SerializeField] const float SPRINT_SPEED_MULTIPLIER = 2.0f;
     public bool isSprinting = false;
@@ -74,7 +74,7 @@ public class PlayerMovementController : MonoBehaviour
         if (playerCameraManager.currentCameraMode == PlayerCameraManager.CameraType.FPS) { isSprinting = isSprinting && (moveInput.y > 0.0f); }
         float currentSprintSpeedMultiplier = (isSprinting && isPlayerMovingInt==1) ? SPRINT_SPEED_MULTIPLIER : 1.0f;
 
-        float aimingSpeedPenaulty = 1.0f - Convert.ToInt32(playerCombatController.isAiming) * 0.75f;
+        float aimingSpeedPenaulty = 1.0f - Convert.ToInt32(playerCombatController.isAiming) * 0.5f;
         currentMoveSpeed = Mathf.Lerp(
             currentMoveSpeed,
             isPlayerStandingStillInt * 0.0f + isPlayerMovingInt * (MAX_WALKING_SPEED * currentSprintSpeedMultiplier * aimingSpeedPenaulty),
