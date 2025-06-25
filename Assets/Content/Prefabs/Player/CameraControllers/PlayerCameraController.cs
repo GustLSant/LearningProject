@@ -111,6 +111,13 @@ public abstract class PlayerCameraController : MonoBehaviour
     }
 
 
+    public virtual void setIsActive(bool _value)
+    {
+        gameObject.SetActive(_value);
+        cameraObject.SetActive(_value);
+    }
+
+
     void getInputValues()
     {
         rotInput = pInpM.lookAction.ReadValue<Vector2>();

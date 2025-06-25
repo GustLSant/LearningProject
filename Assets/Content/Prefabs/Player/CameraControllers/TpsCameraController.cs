@@ -5,7 +5,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class TpsCameraController : PlayerCameraController
 {
-    GameObject refBodyRot;
+    GameObject fixedPivotRot; // para a rotacao do corpo e efeito de delay na posicao da camera
     readonly Vector3 DEFAULT_CAMERA_POS = new Vector3(1.0f, 0.5f, -2.75f);
 
     float currentCameraSide = 1.0f;
@@ -15,7 +15,9 @@ public class TpsCameraController : PlayerCameraController
     protected override void Awake()
     {
         base.Awake();
-        refBodyRot = transform.Find("PivotRefRot").gameObject;
+        fixedPivotRot = transform.Find("FixedPivotRot").gameObject;
+
+        pivotRot.transform.SetParent(null, true);
     }
 
 
@@ -24,32 +26,26 @@ public class TpsCameraController : PlayerCameraController
         base.LateUpdate();
         if (pInpM.toggleTpsCameraSideAction.WasPressedThisFrame()) { toggleTpsCameraSide(); }
         handleCameraSideInterpolation();
-        handleCameraPosition();
+        handleCameraCollision();
+    }
+
+    void FixedUpdate()
+    {
         handleCameraDelayEffect();
     }
 
 
     void handleCameraDelayEffect()
     {
-        Vector3 targetOffset = Vector3.zero;
-
-        targetOffset.x -= playerMovementController.moveInput.x;
-        targetOffset.z -= playerMovementController.moveInput.y;
-        targetOffset = targetOffset.normalized;
-
-        // calculo de intensidade basedo na quantidade de movimento
-        targetOffset *= 0.3f + (Convert.ToInt32(playerMovementController.isSprinting) * 0.3f);
-        targetOffset *= 1.0f - (Convert.ToInt32(playerCombatController.isAiming) * 0.5f);
-
-        pivotRecoil.transform.localPosition = Vector3.Lerp(
-            pivotRecoil.transform.localPosition,
-            targetOffset,
-            Time.deltaTime * 8.0f
+        pivotRot.transform.position = Vector3.Lerp(
+            pivotRot.transform.position,
+            fixedPivotRot.transform.position,
+            10.0f * Time.fixedDeltaTime
         );
     }
 
 
-    void handleCameraPosition()
+    void handleCameraCollision()
     {
         Vector3 targetPosition = DEFAULT_CAMERA_POS;
         targetPosition.x *= currentCameraSide;
@@ -77,11 +73,11 @@ public class TpsCameraController : PlayerCameraController
         if (isPlayerMoving)
         {
             Vector3 targetPos = body.transform.position + moveDirection * 100.0f;
-            refBodyRot.transform.LookAt(targetPos);
+            fixedPivotRot.transform.LookAt(targetPos);
 
             body.transform.rotation = Quaternion.Slerp(
                 body.transform.rotation,
-                refBodyRot.transform.rotation,
+                fixedPivotRot.transform.rotation,
                 15.0f * Time.deltaTime
             );
         }
@@ -102,5 +98,12 @@ public class TpsCameraController : PlayerCameraController
     public void toggleTpsCameraSide()
     {
         targetCameraSide *= -1.0f;
+    }
+
+
+    public override void setIsActive(bool _value)
+    {
+        base.setIsActive(_value);
+        if (_value == true) { pivotRot.transform.position = fixedPivotRot.transform.position; }
     }
 }

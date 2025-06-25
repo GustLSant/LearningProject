@@ -8,8 +8,6 @@ public class PlayerCameraManager : MonoBehaviour
 
     PlayerInputManager pInpM;
 
-    GameObject fpsRoot;
-    GameObject tpsRoot;
     FpsCameraController fpsCameraController;
     TpsCameraController tpsCameraController;
 
@@ -29,10 +27,8 @@ public class PlayerCameraManager : MonoBehaviour
     {
         pInpM = GameObject.FindWithTag("PlayerInputManager").GetComponent<PlayerInputManager>();
 
-        fpsRoot = GameObject.FindGameObjectWithTag("PlayerFpsCameraController");
-        tpsRoot = GameObject.FindGameObjectWithTag("PlayerTpsCameraController");
-        fpsCameraController = fpsRoot.GetComponent<FpsCameraController>();
-        tpsCameraController = tpsRoot.GetComponent<TpsCameraController>();
+        fpsCameraController = GameObject.FindGameObjectWithTag("PlayerFpsCameraController").GetComponent<FpsCameraController>();
+        tpsCameraController = GameObject.FindGameObjectWithTag("PlayerTpsCameraController").GetComponent<TpsCameraController>();
 
         setCameraType(CameraType.FPS);
 
@@ -53,16 +49,16 @@ public class PlayerCameraManager : MonoBehaviour
         {
             currentCameraMode = CameraType.FPS;
             currentPivotRot = fpsCameraController.pivotRot;
-            fpsRoot.SetActive(true);
-            tpsRoot.SetActive(false);
+            fpsCameraController.setIsActive(true);
+            tpsCameraController.setIsActive(false);
             fpsCameraController.syncCameraRotation(tpsCameraController.cameraRotation);
         }
         else
         {
             currentCameraMode = CameraType.TPS;
             currentPivotRot = tpsCameraController.pivotRot;
-            fpsRoot.SetActive(false);
-            tpsRoot.SetActive(true);
+            fpsCameraController.setIsActive(false);
+            tpsCameraController.setIsActive(true);
             tpsCameraController.syncCameraRotation(fpsCameraController.cameraRotation);
         }
     }
