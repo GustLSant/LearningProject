@@ -8,7 +8,6 @@ public abstract class PlayerCameraController : MonoBehaviour
 
     [HideInInspector] public GameObject pivotRot;
     protected GameObject pivotSway;
-    protected GameObject pivotRecoil;
     protected GameObject pivotShake;
     protected GameObject cameraObject;
     protected Camera cameraComponent;
@@ -30,9 +29,8 @@ public abstract class PlayerCameraController : MonoBehaviour
 
         pivotRot = transform.Find("PivotRot").gameObject;
         pivotSway = transform.Find("PivotRot/PivotSway").gameObject;
-        pivotRecoil = transform.Find("PivotRot/PivotSway/PivotRecoil").gameObject;
-        pivotShake = transform.Find("PivotRot/PivotSway/PivotRecoil/PivotShake").gameObject;
-        cameraObject = transform.Find("PivotRot/PivotSway/PivotRecoil/PivotShake/Camera").gameObject;
+        pivotShake = transform.Find("PivotRot/PivotSway/PivotShake").gameObject;
+        cameraObject = transform.Find("PivotRot/PivotSway/PivotShake/Camera").gameObject;
         cameraComponent = cameraObject.GetComponent<Camera>();
 
         playerMovementController = player.GetComponent<PlayerMovementController>();
@@ -78,7 +76,6 @@ public abstract class PlayerCameraController : MonoBehaviour
 
     void handleSwayEffect()
     {
-        int isPlayerStandingStillInt = Convert.ToInt32(playerMovementController.moveDirection == Vector3.zero);
         int isPlayerMoving = Convert.ToInt32(playerMovementController.moveDirection != Vector3.zero);
         int isPlayerSprintingInt = Convert.ToInt32(playerMovementController.isSprinting);
 

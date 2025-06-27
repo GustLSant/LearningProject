@@ -16,10 +16,10 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] const float MOVE_SPEED_ACCELERATION = 12.0f;
     [HideInInspector] public float currentMoveSpeed = 0.0f;
     [HideInInspector] public Vector3 moveDirection;
-    public Vector2 moveInput;
+    [HideInInspector] public Vector2 moveInput;
 
     [SerializeField] const float SPRINT_SPEED_MULTIPLIER = 2.0f;
-    public bool isSprinting = false;
+    [HideInInspector] public bool isSprinting = false;
 
 
     void Awake()
@@ -47,12 +47,12 @@ public class PlayerMovementController : MonoBehaviour
 
     void getInputValues()
     {
-        if (S_GameSettings.instance.isSprintHoldMode) { print("NAOOOOO");  isSprinting = pInpM.sprintAction.IsPressed(); }
+        if (S_GameSettings.instance.isSprintHoldMode) { isSprinting = pInpM.sprintAction.IsPressed(); }
         else
         {
             if (pInpM.sprintAction.WasPressedThisFrame()) { isSprinting = !isSprinting; }
         }
-        
+
         moveInput = pInpM.moveAction.ReadValue<Vector2>();
     }
 
@@ -60,7 +60,7 @@ public class PlayerMovementController : MonoBehaviour
     void handleMovement()
     {
         GameObject pivotRot = playerCameraManager.currentPivotRot;
-        
+
         moveDirection = pivotRot.transform.forward * moveInput.y + pivotRot.transform.right * moveInput.x;
         moveDirection.y = 0.0f;
         moveDirection = moveDirection.normalized;
@@ -72,7 +72,7 @@ public class PlayerMovementController : MonoBehaviour
         isSprinting = isSprinting && !playerCombatController.isAiming && (moveDirection != Vector3.zero);
         // em primeira pessoa, so corre se estiver andando pra frente
         if (playerCameraManager.currentCameraMode == PlayerCameraManager.CameraType.FPS) { isSprinting = isSprinting && (moveInput.y > 0.0f); }
-        float currentSprintSpeedMultiplier = (isSprinting && isPlayerMovingInt==1) ? SPRINT_SPEED_MULTIPLIER : 1.0f;
+        float currentSprintSpeedMultiplier = (isSprinting && isPlayerMovingInt == 1) ? SPRINT_SPEED_MULTIPLIER : 1.0f;
 
         float aimingSpeedPenaulty = 1.0f - Convert.ToInt32(playerCombatController.isAiming) * 0.5f;
         currentMoveSpeed = Mathf.Lerp(
@@ -84,5 +84,23 @@ public class PlayerMovementController : MonoBehaviour
         Vector3 verticalMovement = new Vector3(0.0f, playerJumpManager.currentVerticalMovement, 0.0f);
 
         controller.Move((moveDirection * currentMoveSpeed * aimingSpeedPenaulty + verticalMovement) * Time.deltaTime);
+        // CollisionFlags flags = 
+        // if ((flags & CollisionFlags.Sides) != 0)
+        // {
+        //     Debug.Log("Colidiu com algo na lateral.");
+        // }
+        // if ((flags & CollisionFlags.Above) != 0)
+        // {
+        //     Debug.Log("Colidiu com algo acima.");
+        // }
+        // if ((flags & CollisionFlags.Below) != 0)
+        // {
+        //     Debug.Log("Colidiu com algo abaixo.");
+        // }
     }
+    
+    // void OnControllerColliderHit(ControllerColliderHit hit)
+    // {
+    //     Debug.Log("Colidiu com: " + hit.gameObject.name);
+    // }
 }

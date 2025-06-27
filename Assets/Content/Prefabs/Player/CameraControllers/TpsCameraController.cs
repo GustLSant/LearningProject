@@ -104,6 +104,7 @@ public class TpsCameraController : PlayerCameraController
     public override void setIsActive(bool _value)
     {
         base.setIsActive(_value);
+        body.SetActive(_value);
         if (_value == true) { pivotRot.transform.position = fixedPivotRot.transform.position; }
     }
 }
