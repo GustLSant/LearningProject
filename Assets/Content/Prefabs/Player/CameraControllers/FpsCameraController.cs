@@ -15,32 +15,36 @@ public class FpsCameraController : PlayerCameraController
     }
 
 
-    void Update()
+    protected override void LateUpdate()
     {
+        base.LateUpdate();
         handleBodyPosition();
     }
 
 
     void FixedUpdate()
     {
-        handleBodyYDelayEffect();
+        // handleBodyYDelayEffect();
     }
 
 
     override protected void handleBodyRotation()
     {
-        body.transform.rotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0.0f);
+        // body.transform.rotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0.0f);
     }
 
 
     void handleBodyPosition()
     {
-        Vector3 newPosition = new Vector3(
-            pivotRot.transform.position.x,
-            body.transform.position.y,
-            pivotRot.transform.position.z
-        );
-        body.transform.position = newPosition; // posicao com o Y desatualizado
+        // Vector3 newPosition = new Vector3(
+        //     pivotRot.transform.position.x,
+        //     body.transform.position.y,
+        //     pivotRot.transform.position.z
+        // );
+        // body.transform.position = newPosition; // posicao com o Y desatualizado
+
+        body.transform.position = bodyPosRef.transform.position;
+        body.transform.rotation = bodyPosRef.transform.rotation;
     }
 
     void handleBodyYDelayEffect()
